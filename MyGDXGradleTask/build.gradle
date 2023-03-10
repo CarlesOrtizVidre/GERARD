@@ -1,0 +1,110 @@
+import java.awt.Desktop
+
+buildscript {
+    
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        google()
+    }
+    dependencies {
+        
+
+    }
+}
+
+allprojects {
+    apply plugin: "eclipse"
+
+    version = '1.0'
+    ext {
+        appName = "MyGDXGradleTask"
+        gdxVersion = '1.11.0'
+        roboVMVersion = '2.3.16'
+        box2DLightsVersion = '1.5'
+        ashleyVersion = '1.7.4'
+        aiVersion = '1.8.2'
+        gdxControllersVersion = '2.2.1'
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+        maven { url "https://jitpack.io" }
+    }
+}
+
+project(":desktop") {
+    apply plugin: "java-library"
+
+
+    dependencies {
+        implementation project(":core")
+        api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        
+    }
+}
+
+project(":core") {
+    apply plugin: "java-library"
+
+
+    dependencies {
+        api "com.badlogicgames.gdx:gdx:$gdxVersion"
+        
+    }
+}
+
+tasks.register("descomprimir", Copy) {
+    from zipTree("piskel.zip")
+    into(Desktop)
+}
+import javax.imageio.ImageIO
+import java.awt.Graphics
+import java.awt.image.BufferedImage
+tasks.register("ensamblar" ) {
+
+    BufferedImage result = new BufferedImage(64, 64*4, BufferedImage.TYPE_INT_RGB)
+    Graphics g = result.getGraphics()
+
+    int y = -64
+    file("somedirectory").listFiles({file -> file.name.endsWith(".png")} as FileFilter).each {file ->
+        g.drawImage(ImageIO.read(file), 0, y+=64, 64, 64, null)
+    }
+    ImageIO.write(result,"png",new File("atlas.png"))
+}
+tasks.register("eliminar", Delete) {
+    delete buildDir
+
+}
+
+import java.nio.file.Paths;
+import java.nio.file.Files;
+
+tasks.register("generar strings") {
+
+    String codigo = "class Loquesea {" +
+
+        "static String[] talycual = {"
+
+
+"""
+
+    for(cada frase)
+        codigo += frase + ","
+    
+    codigo += """
+
+
+
+    
+Files.writeString(Paths.get("src/Loquesea.java"));
+
